@@ -1,0 +1,5 @@
+1. En (figura 2) se puedo ver que entre mas palabras aumentan mas las veces que lo comparten pero se ve que hay mas articulos de menos de 1000 palabras que estan por encima de la mayaria 
+
+2. En (figura 3) se ve que no solo depende de la cantidad de palabras ser mas compartido sino la la combinacion de factores generas mas compartidos 
+
+3. Al parecer a la amyoria de los escritores le gustan escribir entre 500 y 2000 palabras
