@@ -1,0 +1,3 @@
+MÉTODOS CUANTITATIVOS:
+Series temporales 
+- Método de Promedio Móvil (Moving Average)
