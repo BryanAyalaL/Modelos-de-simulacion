@@ -10,7 +10,7 @@ plt.style.use('ggplot')
 pd.options.display.float_format = '{:,.2f}'.format
 
 # Paso 1: Carga y conversión de fechas
-data = pd.read_csv("Pronosticos\Cuantitativos\Ventas.csv")
+data = pd.read_csv("Pronosticos/Cuantitativos/Ventas.csv")  # Usa / o \\ para separar directorios
 
 # Generar fechas asumiendo orden cronológico y año 2023
 data['Fecha'] = pd.to_datetime(
@@ -20,7 +20,8 @@ data['Fecha'] = pd.to_datetime(
 data = data.set_index('Fecha').asfreq('MS')
 data.index = data.index.to_period('M').to_timestamp()  # Forzar formato datetime
 
-# Paso 2: Cálculo de pronósticos (sin cambios)
+# Paso 2: Cálculo de pronósticos
+
 # Promedio móvil
 rolling_mean = data['Ventas'].rolling(window=3).mean()
 
@@ -34,9 +35,10 @@ forecast_arima = model_arima.forecast(steps=3)
 
 # Método de pesos aplicados
 weights = np.array([3, 2, 1])
-weighted_avg = (data['Ventas'].rolling(window=3)
-                              .apply(lambda x: np.dot(x, weights)/weights.sum(), raw=True)
-forecast_weighted = [weighted_avg.iloc[-1]] * 3)  # Usar iloc para acceso seguro
+weighted_avg = data['Ventas'].rolling(window=3).apply(
+    lambda x: np.dot(x, weights) / weights.sum(), raw=True
+)
+forecast_weighted = [weighted_avg.iloc[-1]] * 3  # Usar iloc para acceso seguro
 
 # Generación de fechas futuras
 last_date = data.index[-1]
@@ -45,9 +47,6 @@ forecast_dates = pd.date_range(
     periods=3,
     freq='MS'
 )
-
-# Resto del código manteniendo tablas y gráficos...
-# [Mantener igual desde la creación de tablas hasta el final]
 
 # Paso 3: Creación de tablas de resultados
 historical_table = pd.DataFrame({
@@ -62,13 +61,22 @@ forecast_table = pd.DataFrame({
     'Pesos Aplicados': forecast_weighted
 }, index=forecast_dates)
 
-print("\n➤ Tabla de Datos Históricos y Métricas:")
-print(historical_table.to_markdown(tablefmt="grid", stralign='center', numalign='center'))
-
-print("\n➤ Tabla de Pronósticos para el Próximo Trimestre:")
-print(forecast_table.to_markdown(tablefmt="grid", stralign='center', numalign='center'))
-
-# Paso 4: Visualización (sin cambios)
+# Opción 1: Con tabulate instalado
+try:
+    print("\n➤ Tabla de Datos Históricos y Métricas:")
+    print(historical_table.to_markdown(tablefmt="grid", stralign='center', numalign='center'))
+    
+    print("\n➤ Tabla de Pronósticos para el Próximo Trimestre:")
+    print(forecast_table.to_markdown(tablefmt="grid", stralign='center', numalign='center'))
+except ImportError:
+    # Opción 2: Sin tabulate
+    print("\n➤ Tabla de Datos Históricos y Métricas:")
+    print(historical_table.to_string())
+    
+    print("\n➤ Tabla de Pronósticos para el Próximo Trimestre:")
+    print(forecast_table.to_string())
+    
+# Paso 4: Visualización
 plt.figure(figsize=(14, 7))
 plt.gca().xaxis.set_major_formatter(plt.matplotlib.dates.DateFormatter("%b-%Y"))
 
