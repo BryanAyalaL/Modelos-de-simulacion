@@ -10,7 +10,7 @@ plt.style.use('ggplot')
 pd.options.display.float_format = '{:,.2f}'.format
 
 # Paso 1: Carga y conversión de fechas
-data = pd.read_csv("Pronosticos/Cuantitativos/Ventas.csv")  # Usa / o \\ para separar directorios
+data = pd.read_csv("Pronosticos/Cuantitativos/Ventas.csv") 
 
 # Generar fechas asumiendo orden cronológico y año 2023
 data['Fecha'] = pd.to_datetime(
@@ -18,7 +18,7 @@ data['Fecha'] = pd.to_datetime(
     format='%Y-%m-%d'
 )
 data = data.set_index('Fecha').asfreq('MS')
-data.index = data.index.to_period('M').to_timestamp()  # Forzar formato datetime
+data.index = data.index.to_period('M').to_timestamp() 
 
 # Paso 2: Cálculo de pronósticos
 
@@ -33,12 +33,13 @@ forecast_exp = model_exp.forecast(steps=3)
 model_arima = ARIMA(data['Ventas'], order=(1, 1, 1)).fit()
 forecast_arima = model_arima.forecast(steps=3)
 
-# Método de pesos aplicados
-weights = np.array([3, 2, 1])
+# Método de pesos aplicados (Corregido)
+weights = np.array([3, 2, 1])  # Pesos según la imagen
 weighted_avg = data['Ventas'].rolling(window=3).apply(
-    lambda x: np.dot(x, weights) / weights.sum(), raw=True
+    lambda x: np.dot(x[::-1], weights) / weights.sum(),  # Invertir el orden de la ventana
+    raw=True
 )
-forecast_weighted = [weighted_avg.iloc[-1]] * 3  # Usar iloc para acceso seguro
+forecast_weighted = [weighted_avg.iloc[-1]] * 3  # Pronóstico
 
 # Generación de fechas futuras
 last_date = data.index[-1]
@@ -75,7 +76,7 @@ except ImportError:
     
     print("\n➤ Tabla de Pronósticos para el Próximo Trimestre:")
     print(forecast_table.to_string())
-    
+
 # Paso 4: Visualización
 plt.figure(figsize=(14, 7))
 plt.gca().xaxis.set_major_formatter(plt.matplotlib.dates.DateFormatter("%b-%Y"))
